@@ -1,0 +1,73 @@
+server:
+  address: 0.0.0.0   # Allow all network interfaces
+  port: 8080
+#  ssl: enabled=false
+
+spring:
+  application:
+    name: metro-ticket-system
+
+  # --- DATABASE CONFIGURATION ---
+  datasource:
+    url: jdbc:mysql://mysql:3308/metro_db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+
+  # --- JPA & HIBERNATE CONFIGURATION ---
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  # --- MAIL (GMAIL SMTP) CONFIGURATION ---
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: yash.mali2133@gmail.com
+    password: nkxyfgnyjgfodrpz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# --- CUSTOM APPLICATION CONFIGURATION ---
+app:
+  frontend:
+    origin: "*"
+#    origin: http://127.0.0.1:5500
+
+# --- JWT SECRET CONFIGURATION ---
+jwt:
+  secret-key: K7ggfnP94T1J86iO0iK5A/YmYLX7v8l8y8bKzIpfYlU36/M4A05D4ANj4Ea/GiDOQYh58jD2qtfTz49D5gXqIQ==
+  access-token-ms: 36000000000
+  refresh-token-ms: 604800000000
+
+# --- RAZORPAY CONFIGURATION ---
+razorpay:
+  key:
+    id: rzp_test_ROfSryGw59bffw
+    secret: bFiPVNT9qz26MVnN8RhXKc6N
+  webhook:
+    secret: ${RAZORPAY_WEBHOOK_SECRET:Whs_MetroRzpy2025!Secr3t#P@ssKey}
+
+# --- RATE LIMITING CONFIGURATION ---
+rate-limit:
+  default:
+    capacity: 40
+    refill-rate: 20
+    refill-period-seconds: 1
+  auth:
+    capacity: 10
+    refill-rate: 5
+    refill-period-seconds: 1
+
+# --- SWAGGER / SPRINGDOC CONFIGURATION ---
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
