@@ -1,0 +1,53 @@
+# render.yaml - Blueprint: metro-backend + MySQL (example)
+services:
+  - type: pserv           # private service (MySQL)
+    name: metro-mysql
+    env: docker
+    repo: https://github.com/render-examples/mysql.git
+    branch: master
+    region: oregon
+    plan: standard
+    numInstances: 1
+    disk:
+      name: metro-mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+    envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        sync: false       # prompt for secret value when creating blueprint
+      - key: MYSQL_DATABASE
+        value: metro_db
+      - key: MYSQL_USER
+        value: root
+      - key: MYSQL_PASSWORD
+        sync: false
+
+  - type: web            # public web service (your Spring Boot app)
+    name: metro-backend
+    env: docker
+    repo: https://github.com/YashMali13/CapstonProject_MahaMetro-Backend.git
+    branch: main
+    region: oregon
+    plan: starter
+    numInstances: 1
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    buildCommand: mvn clean package -DskipTests -Dmaven.test.skip=true
+    # startCommand builds JDBC URL at runtime using MYSQL_HOSTPORT provided by 'metro-mysql'
+    startCommand: bash -lc 'export SPRING_DATASOURCE_URL="jdbc:mysql://${MYSQL_HOSTPORT}/metro_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"; java -jar app.jar'
+    envVars:
+      - key: MYSQL_HOSTPORT
+        fromService:
+          type: pserv
+          name: metro-mysql
+          property: hostport
+      - key: SPRING_DATASOURCE_USERNAME
+        value: root
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false       # set the DB password in dashboard when creating the blueprint
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
